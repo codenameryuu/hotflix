@@ -100,12 +100,16 @@ class OmdbApi
      */
     public function detailFilm($request)
     {
+        $status = false;
+        $message = MessageHelper::retrieveFail();
+        $data = null;
+
         $url = config('omdb.api_base_url');
         $apiKey = config('omdb.api_key');
 
         $client = new GuzzleClient();
 
-        $data = [
+        $payload = [
             'query' => [
                 'apikey' => $apiKey,
                 'i' => $request->id,
@@ -113,29 +117,28 @@ class OmdbApi
         ];
 
         $guzzleRequest = new GuzzleRequest('GET', $url);
-        $response = $client->sendAsync($guzzleRequest, $data)->wait();
+        $response = $client->sendAsync($guzzleRequest, $payload)->wait();
 
         $statusCode = $response->getStatusCode();
 
         if ($statusCode == 200) {
-            $status = true;
-            $message = MessageHelper::retrieveSuccess();
+            $content = json_decode($response->getBody()->getContents());
 
-            $data = json_decode($response->getBody()->getContents());
+            if ($content->Response == 'True') {
+                $status = true;
+                $message = MessageHelper::retrieveSuccess();
+                $data = $content;
 
-            $isFavorite = UserFavorite::where('user_id', Auth::user()->id)
-                ->where('film_id', $data->imdbID)
-                ->first();
+                $isFavorite = UserFavorite::where('user_id', Auth::user()->id)
+                    ->where('film_id', $data->imdbID)
+                    ->first();
 
-            if ($isFavorite) {
-                $data->is_favorite = true;
-            } else {
-                $data->is_favorite = false;
+                if ($isFavorite) {
+                    $data->is_favorite = true;
+                } else {
+                    $data->is_favorite = false;
+                }
             }
-        } else {
-            $status = false;
-            $message = MessageHelper::registerFail();
-            $data = [];
         }
 
         $result = (object) [

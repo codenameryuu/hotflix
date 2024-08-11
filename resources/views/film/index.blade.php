@@ -142,6 +142,12 @@
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
+                @else
+                    <div class="d-flex justify-content-center mt-5">
+                        <h1 class="text-white">
+                            No Data Found
+                        </h1>
+                    </div>
                 @endif
             </div>
         </div>
@@ -159,40 +165,54 @@
         </div>
 
         <div class="mfilter__select-wrap">
-            <div class="sign__group">
-                <select class="filter__select filter-type-mobile" name="typeMobile" id="typeMobile">
-                    <option value="">
-                        All
-                    </option>
+            <form id="formSubmitMobile" method="GET" action="javascript:void(0)">
+                <div class="sign__group mb-3">
+                    <select class="filter__select filter-type-mobile" name="typeMobile" id="typeMobile">
+                        @if ($filter->type)
+                            <option value="{{ $filter->type }}">
+                                {{ ucfirst($filter->type) }}
+                            </option>
+                        @endif
 
-                    <option value="episode">
-                        Episode
-                    </option>
+                        <option value="">
+                            All
+                        </option>
 
-                    <option value="movie">
-                        Movie
-                    </option>
+                        @if ($filter->type != 'episode')
+                            <option value="episode">
+                                Episode
+                            </option>
+                        @endif
 
-                    <option value="series">
-                        Series
-                    </option>
-                </select>
-            </div>
+                        @if ($filter->type != 'movie')
+                            <option value="movie">
+                                Movie
+                            </option>
+                        @endif
 
-            <div class="sign__group">
-                <input type="text" class="filter__input" name="mobileYear" id="mobileYear" placeholder="Year"
-                    autocomplete="off">
-            </div>
+                        @if ($filter->type != 'series')
+                            <option value="series">
+                                Series
+                            </option>
+                        @endif
+                    </select>
+                </div>
 
-            <div class="sign__group">
-                <input type="text" class="filter__input" name="mobileSearch" id="mobileSearch" placeholder="Search"
-                    autocomplete="off">
-            </div>
+                <div class="sign__group mb-3">
+                    <input type="text" class="filter__input" id="yearMobile" value="{{ $filter->year }}"
+                        placeholder="Year" autocomplete="off">
+                </div>
+
+                <div class="sign__group mb-3">
+                    <input type="text" class="filter__input" id="searchMobile" value="{{ $filter->search }}"
+                        placeholder="Search" autocomplete="off">
+                </div>
+
+                <button type="submit" class="mfilter__apply">
+                    Apply
+                </button>
+            </form>
         </div>
-
-        <button class="mfilter__apply" type="button">
-            Apply
-        </button>
     </div>
 @endsection
 

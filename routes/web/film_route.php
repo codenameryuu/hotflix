@@ -20,6 +20,9 @@ Route::group(
         Route::post('add-favorite', [FilmController::class, 'addFavorite'])
             ->name('add-favorite');
 
+        Route::get('favorite', [FilmController::class, 'favorite'])
+            ->name('favorite');
+
         Route::get('{id}', [FilmController::class, 'detail'])
             ->name('detail');
     }

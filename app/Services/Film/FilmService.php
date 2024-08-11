@@ -118,6 +118,7 @@ class FilmService
     {
         $status = true;
         $message = MessageHelper::saveSuccess();
+        $createOrDelete = null;
 
         $userFavorite = UserFavorite::where('user_id', Auth::user()->id)
             ->where('film_id', $request->film_id)
@@ -125,6 +126,7 @@ class FilmService
 
         if ($userFavorite) {
             $userFavorite->delete();
+            $createOrDelete = 'delete';
         } else {
             $data = [
                 'user_id' => Auth::user()->id,
@@ -132,12 +134,53 @@ class FilmService
             ];
 
             UserFavorite::create($data);
+            $createOrDelete = 'create';
         }
 
 
         $result = (object) [
             'status' => $status,
             'message' => $message,
+            'createOrDelete' => $createOrDelete,
+        ];
+
+        return $result;
+    }
+
+    /**
+     ** Favorite service.
+     *
+     * @param $request
+     * @return object
+     */
+    public function favorite($request)
+    {
+        $status = true;
+        $message = MessageHelper::retrieveSuccess();
+
+        $userFavorite = UserFavorite::where('user_id', Auth::user()->id)
+            ->get();
+
+        $omdbApi = new OmdbApi();
+
+        $film = [];
+        $index = 0;
+
+        foreach ($userFavorite as $row) {
+            $payload = (object) [
+                'id' => $row->film_id,
+            ];
+
+            $response = $omdbApi->detailFilm($payload);
+
+            $film[$index] = $response->data;
+            $index++;
+        }
+
+        $result = (object) [
+            'status' => $status,
+            'message' => $message,
+            'film' => $film,
         ];
 
         return $result;

@@ -1,4 +1,5 @@
 const form = document.getElementById("formSubmit");
+const formMobile = document.getElementById("formSubmitMobile");
 
 const fv = FormValidation.formValidation(form, {
   fields: {
@@ -40,6 +41,68 @@ const fv = FormValidation.formValidation(form, {
 
   if (year.val() == "") {
     year.attr("name", "");
+  }
+
+  blockCard();
+  formSubmit.attr("action", "/film").submit();
+});
+
+const fvMobile = FormValidation.formValidation(formMobile, {
+  fields: {
+    searchMobile: {
+      validators: {
+        notEmpty: {
+          message: "Search cannot be empty !",
+        },
+      },
+    },
+  },
+  plugins: {
+    trigger: new FormValidation.plugins.Trigger(),
+    bootstrap5: new FormValidation.plugins.Bootstrap5({
+      eleValidClass: "",
+      rowSelector: ".mb-3",
+    }),
+
+    submitButton: new FormValidation.plugins.SubmitButton(),
+    defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+    autoFocus: new FormValidation.plugins.AutoFocus(),
+  },
+  init: (instance) => {
+    instance.on("plugins.message.placed", function (e) {
+      if (e.element.parentElement.classList.contains("input-group")) {
+        e.element.parentElement.insertAdjacentElement("afterend", e.messageElement);
+      }
+    });
+  },
+}).on("core.form.valid", function () {
+  const formSubmit = $("#formSubmit");
+
+  const type = $("#type");
+  const typeMobile = $("#typeMobile");
+
+  const year = $("#year");
+  const yearMobile = $("#yearMobile");
+
+  const search = $("#search");
+  const searchMobile = $("#searchMobile");
+
+  if (typeMobile.val() == "") {
+    type.attr("name", "");
+  } else {
+    type.val(typeMobile.val());
+  }
+
+  if (yearMobile.val() == "") {
+    year.attr("name", "");
+  } else {
+    year.val(yearMobile.val());
+  }
+
+  if (searchMobile.val() == "") {
+    search.attr("name", "");
+  } else {
+    search.val(searchMobile.val());
   }
 
   blockCard();
@@ -141,8 +204,8 @@ function loadMore() {
 }
 
 function addFavorite(id) {
-  // const classFavouriteActive = "item__favorite--active";
-  // const btnFavorite = $(`#btnFavorite${id}`);
+  const classFavouriteActive = "item__favorite--active";
+  const btnFavorite = $(`#btnFavorite${id}`);
 
   axios
     .post("/film/add-favorite", {
@@ -151,7 +214,15 @@ function addFavorite(id) {
     })
     .then((response) => {
       const message = response.data.message;
+      const createOrDelete = response.data.createOrDelete;
 
       notifyInfo(message);
+
+      if (createOrDelete == "create") {
+        btnFavorite.removeClass(classFavouriteActive);
+        btnFavorite.addClass(classFavouriteActive);
+      } else {
+        btnFavorite.removeClass(classFavouriteActive);
+      }
     });
 }

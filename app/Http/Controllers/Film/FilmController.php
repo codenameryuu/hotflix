@@ -72,6 +72,21 @@ class FilmController extends Controller
     }
 
     /**
+     ** Favorite.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function favorite(Request $request)
+    {
+        $result = $this->filmService->favorite($request);
+
+        return view('film.favorite', [
+            'film' => $result->film,
+        ]);
+    }
+
+    /**
      ** Detail.
      *
      * @param Request $request
