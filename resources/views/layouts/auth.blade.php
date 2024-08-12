@@ -72,6 +72,8 @@
 
 <body>
 
+    @include('partials.alert')
+
     @yield('content')
 
     {{-- * Axios --}}

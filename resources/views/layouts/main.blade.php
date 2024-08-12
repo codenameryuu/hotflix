@@ -74,6 +74,8 @@
 
     @include('partials.navbar')
 
+    @include('partials.alert')
+
     @yield('content')
 
     {{-- * Axios --}}
